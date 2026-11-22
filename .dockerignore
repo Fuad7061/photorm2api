@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+data/
+.git/
+.gitignore
+README.md
+PROTOCOL.md
+docs/
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.log
+anon_token.json
+stress_test.py

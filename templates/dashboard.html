@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Photoroom 2API — Dashboard</title>
+  <style>
+    :root{color-scheme:dark;--bg:#0b0f17;--panel:#121826;--panel2:#0d121c;--line:#263049;
+      --txt:#e6e9f2;--muted:#8b94ab;--accent:#7c9cff;--accent2:#a855f7;--ok:#3ddc97;--err:#ff8f8f}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+      background:radial-gradient(1200px 600px at 15% -15%,#1e3a8a33,transparent),
+                 radial-gradient(1000px 600px at 100% 110%,#7c3aed2b,transparent),var(--bg);
+      color:var(--txt);min-height:100vh}
+    a{color:inherit}
+    header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.6rem;
+      border-bottom:1px solid var(--line);background:#0b0f17cc;backdrop-filter:blur(10px);
+      position:sticky;top:0;z-index:20}
+    .brand{display:flex;align-items:center;gap:.7rem;font-weight:800}
+    .logo{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0b0f17}
+    .ver{font-size:.7rem;color:var(--muted);font-weight:500}
+    header .right{display:flex;align-items:center;gap:1rem;font-size:.85rem}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block;margin-right:.35rem;
+      box-shadow:0 0 10px var(--ok)}
+    .layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 62px)}
+    nav{padding:1rem .8rem;border-right:1px solid var(--line);background:#0d121c88}
+    nav .item{display:flex;align-items:center;gap:.65rem;padding:.7rem .85rem;margin:.2rem 0;border-radius:9px;
+      cursor:pointer;color:var(--muted);font-size:.9rem;user-select:none}
+    nav .item:hover{background:#7c9cff12;color:var(--txt)}
+    nav .item.active{background:linear-gradient(90deg,#7c9cff26,#7c9cff08);color:#fff;
+      box-shadow:inset 2px 0 var(--accent)}
+    nav .ico{width:18px;text-align:center;opacity:.9}
+    main{padding:1.6rem;max-width:1180px;width:100%}
+    section{display:none;animation:fade .25s ease}
+    section.active{display:block}
+    @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    h2{margin:0 0 .25rem;font-size:1.3rem}
+    .desc{color:var(--muted);font-size:.85rem;margin-bottom:1.3rem}
+    .grid{display:grid;gap:1rem}
+    .g4{grid-template-columns:repeat(4,1fr)}
+    .g2{grid-template-columns:repeat(2,1fr)}
+    @media(max-width:900px){.g4,.g2{grid-template-columns:1fr}.layout{grid-template-columns:1fr}nav{display:flex;overflow:auto}}
+    .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.1rem}
+    .stat .lab{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+    .stat .val{font-size:1.7rem;font-weight:800;margin-top:.35rem}
+    .stat .val small{font-size:.8rem;color:var(--muted);font-weight:500}
+    label{display:block;font-size:.78rem;color:#aab2c8;margin:.8rem 0 .35rem}
+    input,select,textarea{width:100%;background:var(--panel2);border:1px solid #2b3652;color:var(--txt);
+      padding:.65rem .75rem;border-radius:9px;font-size:.88rem;outline:none;font-family:inherit}
+    textarea{resize:vertical;min-height:92px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.8rem}
+    input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px #7c9cff22}
+    .row{display:flex;gap:.7rem;align-items:end;flex-wrap:wrap}
+    .row>*{flex:1;min-width:150px}
+    button,.btn{border:0;border-radius:9px;padding:.7rem 1.1rem;cursor:pointer;font-weight:800;font-size:.86rem;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));color:#0b0f17;white-space:nowrap}
+    button.ghost,.btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+    button:hover,.btn:hover{filter:brightness(1.1)}
+    button:disabled{opacity:.5;cursor:wait}
+    .tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem}
+    .tabs .t{padding:.4rem .8rem;border-radius:8px;background:var(--panel2);border:1px solid var(--line);
+      cursor:pointer;font-size:.8rem;color:var(--muted)}
+    .tabs .t.on{background:#7c9cff22;color:#fff;border-color:var(--accent)}
+    pre{background:#080b12;border:1px solid var(--line);border-radius:10px;padding:1rem;overflow:auto;
+      font-size:.78rem;line-height:1.55;color:#c7d2fe;max-height:460px}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+    .result img{max-width:100%;max-height:420px;border-radius:10px;border:1px solid var(--line);margin-top:.8rem}
+    table{width:100%;border-collapse:collapse;font-size:.82rem}
+    th,td{text-align:left;padding:.6rem .7rem;border-bottom:1px solid var(--line)}
+    th{color:var(--muted);font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}
+    tr:hover td{background:#7c9cff08}
+    .pill{display:inline-block;padding:.15rem .55rem;border-radius:999px;font-size:.7rem;font-weight:700}
+    .pill.ok{background:#3ddc971e;color:var(--ok)}
+    .pill.err{background:#ff8f8f1e;color:var(--err)}
+    .pill.info{background:#7c9cff1e;color:#9fb6ff}
+    .muted{color:var(--muted)}
+    .msg{font-size:.83rem;margin-top:.7rem;min-height:1.2rem}
+    .msg.ok{color:var(--ok)}.msg.err{color:var(--err)}
+    .toast{position:fixed;right:1.2rem;bottom:1.2rem;background:#162033;border:1px solid var(--line);
+      padding:.8rem 1.1rem;border-radius:10px;font-size:.85rem;z-index:50;display:none;box-shadow:0 10px 40px #0008}
+    .flex{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+    .kv{font-size:.8rem;color:var(--muted)}
+    .kv b{color:var(--txt);font-weight:600}
+    .note{font-size:.75rem;color:var(--muted);margin-top:.4rem;line-height:1.5}
+    .badge{font-size:.7rem;padding:.2rem .5rem;border-radius:6px;background:#7c9cff1e;color:#9fb6ff}
+  </style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">P</div><div>Photoroom 2API <div class="ver">Dashboard · {{ version }}</div></div></div>
+  <div class="right"><span><span class="dot" id="hdrDot"></span><span id="hdrStatus">connecting</span></span>
+    <a class="btn ghost" href="/logout">Sign out</a></div>
+</header>
+<div class="layout">
+  <nav id="nav">
+    <div class="item active" data-s="overview"><span class="ico">▦</span> Overview</div>
+    <div class="item" data-s="playground"><span class="ico">▶</span> Playground</div>
+    <div class="item" data-s="models"><span class="ico">◈</span> Models</div>
+    <div class="item" data-s="docs"><span class="ico">⌘</span> API Docs</div>
+    <div class="item" data-s="logs"><span class="ico">≡</span> Logs</div>
+    <div class="item" data-s="settings"><span class="ico">⚙</span> Settings</div>
+  </nav>
+  <main>
+    <!-- OVERVIEW -->
+    <section id="overview" class="active">
+      <h2>Overview</h2>
+      <div class="desc">Live status of your self-hosted Photoroom gateway. Data persists in a Docker volume, so redeploys never lose your account or keys.</div>
+      <div class="grid g4">
+        <div class="card stat"><div class="lab">Service</div><div class="val" id="sStatus">—</div></div>
+        <div class="card stat"><div class="lab">Active API keys</div><div class="val" id="sKeys">—</div></div>
+        <div class="card stat"><div class="lab">Requests logged</div><div class="val" id="sLogs">—</div></div>
+        <div class="card stat"><div class="lab">Errors</div><div class="val" id="sErrs">—</div></div>
+      </div>
+      <div class="grid g2" style="margin-top:1rem">
+        <div class="card">
+          <h3 style="margin:0 0 .8rem;font-size:1rem">Firebase anonymous account</h3>
+          <div class="kv">UID: <b id="sUid">—</b></div>
+          <div class="kv" style="margin-top:.4rem">Token expires in: <b id="sExp">—</b> seconds</div>
+          <div class="kv" style="margin-top:.4rem">Average upstream latency: <b id="sAvg">—</b> ms</div>
+          <div class="kv" style="margin-top:.4rem">Data directory: <b id="sData">—</b></div>
+          <div class="kv" style="margin-top:.4rem">Output storage: <b id="sStorage">—</b></div>
+          <p class="note">The anonymous account is created once and stored in <code>data/anon_token.json</code>. It auto-refreshes; you can also force a refresh in Settings.</p>
+          <button class="ghost" style="margin-top:.6rem" onclick="summary()">↻ Refresh</button>
+        </div>
+        <div class="card">
+          <h3 style="margin:0 0 .8rem;font-size:1rem">Quick start</h3>
+          <div class="kv">1. Open <b>Settings</b> to set your API key and admin key.</div>
+          <div class="kv" style="margin-top:.4rem">2. Try the <b>Playground</b> with an image URL or base64.</div>
+          <div class="kv" style="margin-top:.4rem">3. Copy ready-made cURL from <b>API Docs</b>.</div>
+          <div class="kv" style="margin-top:.4rem">4. Deploy with the included <b>Dockerfile</b> on Coolify; mount <code>/app/data</code>.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PLAYGROUND -->
+    <section id="playground">
+      <h2>Playground</h2>
+      <div class="desc">Run any endpoint. Provide an image as URL, base64, or upload. Available models are listed for each endpoint.</div>
+      <div class="card">
+        <div class="row">
+          <div><label>Endpoint / Model</label><select id="pgEndpoint" onchange="pgChanged()"></select>
+            <div class="note" id="pgHint" style="margin-top:.3rem"></div></div>
+          <div><label>Input mode</label><select id="pgMode" onchange="pgModeChanged()">
+            <option value="url">Image URL</option><option value="b64">Base64</option><option value="file">Upload file</option>
+          </select></div>
+        </div>
+        <div id="pgUrlWrap"><label>Image URL</label><input id="pgUrl" placeholder="https://example.com/image.jpg"></div>
+        <div id="pgB64Wrap" style="display:none"><label>Base64 (raw or data URI)</label><textarea id="pgB64" placeholder="data:image/jpeg;base64,..."></textarea></div>
+        <div id="pgFileWrap" style="display:none"><label>Upload image</label><input id="pgFile" type="file" accept="image/*"></div>
+        <div id="pgMaskWrap" style="display:none">
+          <div class="row">
+            <div><label>Mask image (URL/base64)</label><input id="pgMask" placeholder="https://... or base64 (white = affected area)"></div>
+          </div>
+        </div>
+        <div id="pgPromptWrap" style="display:none"><label>Prompt</label><input id="pgPrompt" placeholder="a blue sky"></div>
+        <div id="pgSizeWrap" style="display:none"><div class="row">
+          <div><label>Target width</label><input id="pgW" type="number" value="768"></div>
+          <div><label>Target height</label><input id="pgH" type="number" value="768"></div>
+        </div></div>
+        <div id="pgModelWrap" style="display:none"><label>Model type</label><select id="pgModelType">
+          <option>person</option><option>object</option><option>graphics</option><option>standard</option>
+        </select></div>
+        <div style="margin-top:1rem;display:flex;gap:.7rem;align-items:center;flex-wrap:wrap">
+          <button id="pgRun" onclick="pgRun()">▶ Run</button>
+          <span class="msg" id="pgMsg"></span>
+        </div>
+      </div>
+      <div class="grid g2" style="margin-top:1rem">
+        <div class="card result"><h3 style="margin:0 0 .5rem;font-size:1rem">Result</h3><div id="pgResult" class="muted">No result yet.</div></div>
+        <div class="card"><h3 style="margin:0 0 .5rem;font-size:1rem">Generated cURL</h3>
+          <div class="tabs"><div class="t on" onclick="pgCurlTab('url',this)">Image URL</div>
+            <div class="t" onclick="pgCurlTab('b64',this)">Base64</div>
+            <div class="t" onclick="pgCurlTab('multipart',this)">Multipart file</div></div>
+          <pre id="pgCurl"></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODELS -->
+    <section id="models">
+      <h2>Available models</h2>
+      <div class="desc">Use these model IDs with OpenAI-compatible <code>/v1/images/*</code> endpoints, or call the native endpoint directly.</div>
+      <div class="card"><table><thead><tr><th>Model ID</th><th>Endpoint</th><th>Description</th></tr></thead>
+        <tbody id="modelRows"></tbody></table></div>
+    </section>
+
+    <!-- DOCS -->
+    <section id="docs">
+      <h2>API Docs &amp; cURL</h2>
+      <div class="desc">All endpoints accept <b>multipart uploads</b>, <b>image URLs</b>, or <b>base64</b> — use whichever fits your situation. Auth: <code>Authorization: Bearer &lt;API_KEY&gt;</code>.</div>
+      <div class="tabs" id="docTabs"></div>
+      <div class="card"><pre id="docBlock"></pre></div>
+      <div class="card" style="margin-top:1rem">
+        <h3 style="margin:0 0 .5rem;font-size:1rem">Response formats</h3>
+        <p class="note">Default response is JSON containing a download URL — files are NOT stored on your VPS in <code>tmpfiles</code> mode. Use <code>response_format=b64_json</code> for inline base64, <code>response_format=raw</code> for raw bytes, or <code>?redirect=1</code> / <code>response_format=redirect</code> with <code>curl -L -o file.png</code> for a direct download. <code>/v1/images/*</code> always returns JSON (with both <code>url</code> and <code>b64_json</code>).</p>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <h3 style="margin:0 0 .5rem;font-size:1rem">All available parameters</h3>
+        <div class="desc" style="margin-bottom:.7rem">Every parameter, accepted values and example values. Send them as JSON (<code>Content-Type: application/json</code>), as form fields, or as multipart fields.</div>
+        <table><thead><tr><th>Parameter</th><th>Type / accepted values</th><th>Example value</th><th>Used by</th></tr></thead>
+          <tbody id="paramRows"></tbody></table>
+      </div>
+    </section>
+
+    <!-- LOGS -->
+    <section id="logs">
+      <div class="flex"><div><h2>Logs</h2><div class="desc">Recent API activity and admin audit events (newest first). Auto-refreshes every 5s.</div></div>
+        <div><button class="ghost" onclick="loadLogs()">↻ Refresh</button>
+          <button class="ghost" onclick="wipe('logs')" style="margin-left:.4rem">Delete all logs</button>
+          <label style="display:inline-flex;margin-left:.6rem">Auto <input id="logAuto" type="checkbox" checked style="width:auto"></label></div></div>
+      <div class="card"><table><thead><tr><th>Time</th><th>Level</th><th>Endpoint</th><th>Status</th><th>Duration</th><th>Detail</th></tr></thead>
+        <tbody id="logRows"></tbody></table></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings">
+      <h2>Settings</h2>
+      <div class="desc">Rotate keys and manage the anonymous account. Changes take effect immediately and persist in the mounted volume.</div>
+      <div class="grid g2">
+        <div class="card">
+          <h3 style="margin:0 0 .5rem;font-size:1rem">Output / media storage</h3>
+          <label>Where generated files go</label>
+          <select id="setMode">
+            <option value="tmpfiles">tmpfiles.org — auto upload, 48h, nothing stored on VPS</option>
+            <option value="local">VPS local volume — served from /files/…</option>
+          </select>
+          <div class="row">
+            <div><label>tmpfiles expiry (seconds, 60–172800)</label><input id="setExpire" type="number" value="172800"></div>
+            <div><label>Log retention (days)</label><input id="setRetention" type="number" value="10"></div>
+          </div>
+          <button style="margin-top:.7rem" onclick="saveSettings('storage')">Save storage settings</button>
+          <div class="msg" id="storageMsg"></div>
+          <p class="note">In <b>tmpfiles</b> mode every result is uploaded to tmpfiles.org and your VPS keeps only a small SQLite log entry — no images are written to disk. In <b>local</b> mode files are written to <code>/app/data/outputs</code> and served by this app.</p>
+          <h3 style="margin:1.2rem 0 .5rem;font-size:1rem">API key (for clients)</h3>
+          <label>Add / replace API key</label><input id="setApiKey" placeholder="sk-pr-... (leave blank to generate)">
+          <button style="margin-top:.7rem" onclick="saveSettings('api_key')">Add API key</button>
+          <div class="msg" id="setMsg"></div>
+          <h3 style="margin:1.2rem 0 .5rem;font-size:1rem">API keys</h3>
+          <table><thead><tr><th>Name</th><th>Prefix</th><th>Enabled</th><th></th></tr></thead><tbody id="keyRows"></tbody></table>
+        </div>
+        <div class="card">
+          <h3 style="margin:0 0 .5rem;font-size:1rem">Admin key (dashboard access)</h3>
+          <label>New admin key</label><input id="setAdminKey" type="password" placeholder="admin-...">
+          <button style="margin-top:.7rem" onclick="saveSettings('admin_key')">Rotate admin key</button>
+          <p class="note">After rotation you stay signed in. Store this key safely — it cannot be recovered from the dashboard.</p>
+          <h3 style="margin:1.2rem 0 .5rem;font-size:1rem">Firebase account</h3>
+          <button class="ghost" onclick="refreshToken()">↻ Force refresh token</button>
+          <div class="msg" id="tokMsg"></div>
+          <h3 style="margin:1.2rem 0 .5rem;font-size:1rem">Stored files (local mode)</h3>
+          <div class="kv" id="fileCount">—</div>
+          <table style="margin-top:.5rem"><thead><tr><th>File</th><th>Size</th><th></th></tr></thead><tbody id="fileRows"></tbody></table>
+          <h3 style="margin:1.4rem 0 .5rem;font-size:1rem;color:var(--err)">Danger zone</h3>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <button class="ghost" onclick="wipe('outputs')">Delete all files</button>
+            <button class="ghost" onclick="wipe('logs')">Delete all logs</button>
+            <button class="ghost" style="color:var(--err);border-color:var(--err)" onclick="wipe('all')">Delete everything</button>
+          </div>
+          <p class="note">Logs older than the retention setting are also cleared automatically every hour (default: 10 days).</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const MODELS = {{ models|tojson }};
+const $ = id => document.getElementById(id);
+function toast(t){const e=$('toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2600)}
+async function api(path,opt={}){const r=await fetch(path,{credentials:'same-origin',...opt});
+  const ct=r.headers.get('content-type')||'';const d=ct.includes('json')?await r.json():await r.text();
+  if(!r.ok)throw Error(d.error?.message||d.error||r.status);return d}
+
+/* nav */
+document.querySelectorAll('#nav .item').forEach(el=>el.onclick=()=>{
+  document.querySelectorAll('#nav .item').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('section').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');$(el.dataset.s).classList.add('active');
+  if(el.dataset.s==='logs')loadLogs();
+  if(el.dataset.s==='settings'){loadKeys();loadSettings();loadFiles();}
+});
+
+/* overview */
+async function summary(){try{const s=await api('/admin/summary');
+  $('sStatus').textContent=s.status==='ok'?'Online':'Error';$('sKeys').textContent=s.active_keys;
+  $('sLogs').textContent=s.total_logs;$('sErrs').textContent=s.errors;$('sUid').textContent=s.uid;
+  $('sExp').textContent=s.token_exp_in;$('sAvg').textContent=s.avg_ms;$('sData').textContent=s.data_dir;
+  $('sStorage').textContent=(s.output_mode||'tmpfiles')==='tmpfiles'?'tmpfiles.org (48h, no VPS storage)':'VPS local volume';
+  $('hdrStatus').textContent='Online · uid '+s.uid.slice(0,8);$('hdrDot').style.background='var(--ok)';
+}catch(e){$('hdrStatus').textContent='Offline';$('hdrDot').style.background='var(--err)';toast(e.message)}}
+
+/* playground */
+const EP_OPTS=[
+  {id:'/api/mask',label:'Mask — remove background'},{id:'/api/upscale',label:'Upscale 2x'},
+  {id:'/api/erase',label:'Erase'},{id:'/api/fill',label:'Generative fill'},
+  {id:'/api/inpaint',label:'Inpaint'},{id:'/api/uncrop',label:'Uncrop / outpaint'},
+  {id:'/v1/images/edits',label:'OpenAI — image edits'},{id:'/v1/images/generations',label:'OpenAI — generation'}
+];
+function initPg(){const sel=$('pgEndpoint');EP_OPTS.forEach(o=>{const op=document.createElement('option');op.value=o.id;op.textContent=o.label;sel.appendChild(op)});pgChanged();pgCurlTab('url',document.querySelector('#playground .t'))}
+function pgChanged(){const e=$('pgEndpoint').value;
+  const ms=MODELS.filter(m=>m.endpoint===e).map(m=>m.description+(m.model_type?' ('+m.model_type+')':''));
+  $('pgHint').textContent=ms.length?ms.join(' · '):'Select a model for this endpoint';
+  $('pgMaskWrap').style.display=['/api/erase','/api/fill','/api/inpaint'].includes(e)?'block':'none';
+  $('pgPromptWrap').style.display=['/api/fill','/api/uncrop','/v1/images/generations'].includes(e)?'block':'none';
+  $('pgSizeWrap').style.display=e==='/api/uncrop'?'block':'none';
+  $('pgModelWrap').style.display=['/api/mask','/v1/images/edits'].includes(e)?'block':'none';
+  updateCurl()}
+function pgModeChanged(){const m=$('pgMode').value;
+  $('pgUrlWrap').style.display=m==='url'?'block':'none';$('pgB64Wrap').style.display=m==='b64'?'block':'none';
+  $('pgFileWrap').style.display=m==='file'?'block':'none';updateCurl()}
+function imageValue(){const m=$('pgMode').value;
+  if(m==='url')return $('pgUrl').value.trim();if(m==='b64')return $('pgB64').value.trim();return null}
+function payload(){const p={endpoint:$('pgEndpoint').value,image:imageValue(),
+  mask:$('pgMask').value.trim(),prompt:$('pgPrompt').value.trim(),
+  model_type:$('pgModelType').value,model:$('pgModelType').value,
+  target_w:+$('pgW').value,target_h:+$('pgH').value};return p}
+async function pgRun(){const msg=$('pgMsg');msg.className='msg';msg.textContent='Running...';$('pgRun').disabled=true;
+  try{let p=payload();if($('pgMode').value==='file'){const f=$('pgFile').files[0];if(!f)throw Error('choose a file');
+      const rd=new FileReader();p.image=await new Promise(r=>{rd.onload=()=>r(rd.result);rd.readAsDataURL(f)})}
+    const r=await api('/admin/run',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
+    const link=r.url.startsWith('http')?r.url:location.origin+r.url;
+    $('pgResult').innerHTML='<span class="pill ok">OK</span> '+r.bytes+' bytes ('+r.content_type+')'+
+      '<div class="kv" style="margin-top:.5rem">Storage: <b>'+r.storage+'</b>'+(r.expires_in?' · expires in '+Math.round(r.expires_in/3600)+'h':'')+'</div>'+
+      '<div style="margin-top:.5rem"><a class="btn ghost" href="'+link+'" target="_blank" rel="noopener">Open / Download file ↗</a></div>'+
+      (r.share_url?'<div class="kv" style="margin-top:.4rem">Share page: <a href="'+r.share_url+'" target="_blank" rel="noopener">'+r.share_url+'</a></div>':'')+
+      '<img src="data:'+r.content_type+';base64,'+r.b64+'" alt="result">';
+    msg.className='msg ok';msg.textContent='Done';toast('Upscale/operation complete');
+  }catch(e){msg.className='msg err';msg.textContent=e.message;$('pgResult').innerHTML='<span class="pill err">Failed</span> '+e.message}
+  finally{$('pgRun').disabled=false}}
+let curlMode='url';
+function pgCurlTab(m,el){curlMode=m;document.querySelectorAll('#playground .t').forEach(t=>t.classList.remove('on'));el.classList.add('on');updateCurl()}
+function updateCurl(){const e=$('pgEndpoint').value;const base=location.origin;let img;
+  if(curlMode==='url')img='https://example.com/image.jpg';
+  else if(curlMode==='b64')img='data:image/jpeg;base64,/9j/4AAQSk...';
+  else img='@/path/to/image.jpg';
+  let body,ct;
+  if(curlMode==='multipart'){ct='multipart/form-data';body=['  -F "image='+img+';type=image/jpeg"'];
+    if(['/api/erase','/api/fill','/api/inpaint'].includes(e))body.push('  -F "mask=@/path/to/mask.png"');
+    if(e==='/api/mask'||e==='/v1/images/edits')body.push('  -F "model_type=person"');
+    if(e==='/api/uncrop')body.push('  -F "target_w=768" -F "target_h=768"');
+    if(e==='/api/fill')body.push('  -F "prompt=a blue sky"')}
+  else{ct='application/json';const o={image:img};
+    if(['/api/erase','/api/fill','/api/inpaint'].includes(e))o.mask='https://example.com/mask.png';
+    if(e==='/api/uncrop'){o.target_w=768;o.target_h=768}
+    if(e==='/api/fill'||e==='/v1/images/generations')o.prompt='a blue sky';
+    if(e==='/api/mask'||e==='/v1/images/edits')o.model_type='person';
+    body=['  -d \''+JSON.stringify(o,null,2)+'\'']}
+  const s='curl -X POST "'+base+e+'" \\\n  -H "Authorization: Bearer $API_KEY" \\\n  -H "Content-Type: '+ct+'" \\\n'+body.join(' \\\n');
+  $('pgCurl').textContent=s}
+
+/* models */
+function initModels(){$('modelRows').innerHTML=MODELS.map(m=>'<tr><td><span class="badge">'+m.id+'</span></td><td><code>'+m.endpoint+'</code></td><td>'+m.description+'</td></tr>').join('')}
+
+/* docs */
+const DOCS={
+  'Upscale — URL':`# Response = JSON with a 48h download link (nothing stored on VPS)
+RESP=$(curl -s -X POST "__BASE__/api/upscale" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"image": "https://example.com/photo.jpg"}')
+echo "$RESP"
+echo "DOWNLOAD URL: $(echo "$RESP" | python3 -c "import sys,json;print(json.load(sys.stdin)['data'][0]['url'])")
+
+# OR: one-step direct download (works in either storage mode)
+curl -L "__BASE__/api/upscale?redirect=1" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"image": "https://example.com/photo.jpg"}' \\
+  --output upscaled.png`,
+  'Upscale — Base64':`IMG_B64=$(base64 -i photo.jpg | tr -d '\\n')
+RESP=$(curl -s -X POST "__BASE__/api/upscale" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d "{\\"image\\": \\"data:image/jpeg;base64,$IMG_B64\\"}")
+echo "$RESP" | python3 -c "import sys,json;print(json.load(sys.stdin)['data'][0]['url'])"
+
+# Raw base64 (no data: prefix) works too:
+# -d "{\\"image\\": \\"$IMG_B64\\"}"`,
+  'Upscale — Multipart':`RESP=$(curl -s -X POST "__BASE__/api/upscale" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -F "image=@photo.jpg;type=image/jpeg")
+echo "$RESP"
+
+# Direct download instead of JSON:
+curl -L "__BASE__/api/upscale?redirect=1" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -F "image=@photo.jpg;type=image/jpeg" \\
+  --output upscaled.png`,
+  'Mask — remove background':`curl -s -X POST "__BASE__/api/mask" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"image": "https://example.com/photo.jpg", "model_type": "person"}'
+# model_type: person | object | graphics | standard`,
+  'Erase / Fill / Inpaint':`# Erase (white mask = erase)
+curl -s -X POST "__BASE__/api/erase" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"image": "https://example.com/photo.jpg", "mask": "https://example.com/mask.png"}'
+
+# Fill (adds prompt)
+curl -s -X POST "__BASE__/api/fill" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"image": "https://example.com/photo.jpg", "mask": "https://example.com/mask.png", "prompt": "blue sky"}'
+
+# Inpaint (mask area must be < 50%)
+curl -s -X POST "__BASE__/api/inpaint" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"image": "https://example.com/photo.jpg", "mask": "https://example.com/mask.png"}'`,
+  'Uncrop / outpaint':`curl -s -X POST "__BASE__/api/uncrop" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"image": "https://example.com/photo.jpg", "target_w": 1024, "target_h": 1024, "prompt": "more scenery"}'`,
+  'OpenAI compatible':`# Image edits — returns url + b64_json
+curl -s -X POST "__BASE__/v1/images/edits" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"image": "https://example.com/photo.jpg", "model": "person"}'
+
+# Text-to-image generation
+curl -s -X POST "__BASE__/v1/images/generations" \\
+  -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" \\
+  -d '{"prompt": "a yellow macOS-style icon"}'
+
+# List models
+curl "__BASE__/v1/models" -H "Authorization: Bearer $API_KEY"`,
+  'Response formats':`# Default (JSON with download link) — no VPS storage in tmpfiles mode
+curl -s -X POST "__BASE__/api/upscale" -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" -d '{"image": "https://example.com/photo.jpg"}'
+
+# Inline base64 instead of a link
+curl -s -X POST "__BASE__/api/upscale?format=b64_json" -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" -d '{"image": "https://example.com/photo.jpg"}'
+
+# Raw image bytes
+curl -X POST "__BASE__/api/upscale?format=raw" -H "Authorization: Bearer $API_KEY" \\
+  -H "Content-Type: application/json" -d '{"image": "https://example.com/photo.jpg"}' --output out.png`
+};
+const PARAMS=[
+  ['image','string — URL, raw base64, data URI, or local path','https://example.com/photo.jpg','all image endpoints'],
+  ['image_url','string or {url: "..."} (OpenAI style)','{"url": "https://example.com/photo.jpg"}','all image endpoints'],
+  ['image_b64 / b64_json','string — base64 image','/9j/4AAQSk...','all image endpoints'],
+  ['mask','string — URL or base64 (white = affected area)','https://example.com/mask.png','erase, fill, inpaint'],
+  ['model_type','person | object | graphics | standard','person','mask'],
+  ['model','person | object | graphics | standard (OpenAI alias)','person','v1/images/edits'],
+  ['prompt','string — generation instruction','blue sky','fill, uncrop, v1/images/generations'],
+  ['target_w','integer 64–2048 (default 768)','1024','uncrop'],
+  ['target_h','integer 64–2048 (default 768)','1024','uncrop'],
+  ['response_format','url | b64_json | raw | redirect','url','all endpoints (query param also works)'],
+  ['format','url | b64_json | raw | json | redirect (query string)','?format=raw','all endpoints'],
+  ['redirect','1 = 302 redirect to final file URL (use curl -L)','1','all endpoints'],
+  ['Authorization (header)','Bearer <API_KEY>','Bearer sk-pr-...','all API endpoints']
+];
+function initDocs(){const tabs=$('docTabs');Object.keys(DOCS).forEach((k,i)=>{
+  const d=document.createElement('div');d.className='t'+(i===0?' on':'');d.textContent=k;
+  d.onclick=()=>{document.querySelectorAll('#docTabs .t').forEach(x=>x.classList.remove('on'));d.classList.add('on');showDoc(k)};
+  tabs.appendChild(d)});
+  $('paramRows').innerHTML=PARAMS.map(p=>'<tr><td><code>'+p[0]+'</code></td><td>'+p[1]+'</td><td><code>'+escapeHtml(p[2])+'</code></td><td class="muted">'+p[3]+'</td></tr>').join('');
+  showDoc(Object.keys(DOCS)[0])}
+function showDoc(k){$('docBlock').textContent=DOCS[k].replace(/__BASE__/g,location.origin)}
+
+/* logs */
+async function loadLogs(){try{const d=await api('/admin/logs?limit=150');
+  $('logRows').innerHTML=d.data.map(l=>'<tr><td>'+l.ts+'</td><td><span class="pill '+(l.status>=400?'err':'ok')+'">'+l.level+'</span></td><td><code>'+l.endpoint+'</code></td><td>'+l.status+'</td><td>'+l.duration_ms+' ms</td><td class="muted">'+escapeHtml(l.detail||'')+'</td></tr>').join('')||'<tr><td colspan="6" class="muted">No logs yet</td></tr>'}
+  catch(e){console.error(e)}}
+function escapeHtml(s){return String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+setInterval(()=>{if($('logAuto').checked&&$('logs').classList.contains('active'))loadLogs()},5000);
+
+/* settings */
+async function loadKeys(){try{const d=await api('/admin/keys');
+  $('keyRows').innerHTML=d.data.map(k=>'<tr><td>'+k.name+'</td><td><code>'+k.prefix+'</code></td><td>'+(k.enabled?'<span class="pill ok">yes</span>':'no')+'</td><td><button class="ghost" style="padding:.35rem .6rem" onclick="delKey('+k.id+')">Delete</button></td></tr>').join('')||'<tr><td colspan="4" class="muted">No keys</td></tr>'}
+  catch(e){toast(e.message)}}
+async function loadSettings(){try{const d=(await api('/admin/settings')).data;
+  $('setMode').value=d.output_mode;$('setExpire').value=d.tmpfiles_expire;
+  $('setRetention').value=d.log_retention_days;
+  $('fileCount').textContent=d.local_files+' files stored on VPS · '+d.log_rows+' log rows';
+}catch(e){toast(e.message)}}
+async function loadFiles(){try{const d=await api('/admin/files');
+  $('fileRows').innerHTML=d.data.slice(0,30).map(f=>'<tr><td><a href="/files/'+f.name+'" target="_blank">'+f.name+'</a></td><td>'+(f.size/1024).toFixed(0)+'KB</td><td><button class="ghost" style="padding:.3rem .5rem" onclick="wipe(\'outputs\')">Delete all</button></td></tr>').join('')||'<tr><td colspan="3" class="muted">No stored files</td></tr>'}
+  catch(e){toast(e.message)}}
+async function saveSettings(kind){const msg=kind==='storage'?$('storageMsg'):$('setMsg');msg.className='msg';
+  let body={};
+  if(kind==='admin_key')body={admin_key:$('setAdminKey').value.trim()};
+  else if(kind==='api_key')body={api_key:$('setApiKey').value.trim()};
+  else body={output_mode:$('setMode').value,tmpfiles_expire:$('setExpire').value,
+             log_retention_days:$('setRetention').value};
+  try{await api('/admin/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    msg.className='msg ok';msg.textContent='Saved';$('setApiKey').value='';$('setAdminKey').value='';
+    loadKeys();loadSettings();loadFiles();summary();toast('Settings saved');
+  }catch(e){msg.className='msg err';msg.textContent=e.message}}
+async function wipe(target){const label=target==='all'?'ALL files and ALL logs':(target==='logs'?'all logs':'all stored files');
+  if(!confirm('Permanently delete '+label+'? This cannot be undone.'))return;
+  try{const targets=target==='all'?['outputs','logs']:[target];
+    const r=await api('/admin/cleanup',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({targets:targets})});
+    toast('Deleted '+r.outputs_deleted+' files, '+r.logs_deleted+' logs');
+    loadLogs();loadSettings();loadFiles();
+  }catch(e){toast(e.message)}}
+async function delKey(id){if(!confirm('Delete this API key?'))return;
+  try{await api('/admin/keys?id='+id,{method:'DELETE'});loadKeys();toast('Key deleted')}catch(e){toast(e.message)}}
+async function refreshToken(){const m=$('tokMsg');m.className='msg';m.textContent='Refreshing...';
+  try{const r=await api('/admin/token/refresh',{method:'POST'});m.className='msg ok';m.textContent='Refreshed · expires in '+r.token_exp_in+'s';summary()}
+  catch(e){m.className='msg err';m.textContent=e.message}}
+
+initPg();initModels();initDocs();summary();
+</script>
+</body>
+</html>

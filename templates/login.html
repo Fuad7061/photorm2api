@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Photoroom 2API — Admin Login</title>
+  <style>
+    :root{color-scheme:dark}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+      background:radial-gradient(1200px 600px at 20% -10%,#1e3a8a33,transparent),
+                 radial-gradient(1000px 500px at 90% 110%,#7c3aed33,transparent),#0b0f17;color:#e6e9f2}
+    .card{width:min(420px,92vw);background:#121826ee;border:1px solid #263049;border-radius:18px;
+      padding:2rem;box-shadow:0 24px 70px #0008}
+    .brand{display:flex;align-items:center;gap:.7rem;margin-bottom:1.3rem}
+    .logo{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;
+      background:linear-gradient(135deg,#7c9cff,#a855f7);font-weight:800;color:#0b0f17}
+    h1{font-size:1.15rem;margin:0}
+    p.sub{color:#8b94ab;font-size:.85rem;margin:.25rem 0 1.4rem}
+    label{font-size:.78rem;color:#aab2c8;display:block;margin-bottom:.4rem}
+    input{width:100%;padding:.75rem .9rem;border-radius:10px;border:1px solid #2b3652;
+      background:#0d121c;color:#eef;font-size:.95rem;outline:none}
+    input:focus{border-color:#7c9cff;box-shadow:0 0 0 3px #7c9cff22}
+    button{margin-top:1rem;width:100%;padding:.8rem;border:0;border-radius:10px;cursor:pointer;
+      background:linear-gradient(135deg,#7c9cff,#8b5cf6);color:#0b0f17;font-weight:800;font-size:.95rem}
+    .err{margin-top:.9rem;color:#ff8f8f;font-size:.85rem}
+    .hint{margin-top:1.2rem;font-size:.75rem;color:#6f7a93;line-height:1.6}
+    code{background:#0d121c;border:1px solid #263049;padding:.1rem .35rem;border-radius:5px;color:#b9c6ff}
+  </style>
+</head>
+<body>
+  <form class="card" method="post">
+    <div class="brand"><div class="logo">P</div><div><h1>Photoroom 2API</h1>
+      <p class="sub">Self-hosted dashboard</p></div></div>
+    <label for="admin_key">Admin key</label>
+    <input id="admin_key" name="admin_key" type="password" autocomplete="current-password" autofocus placeholder="admin-...">
+    <button type="submit">Sign in</button>
+    {% if err %}<div class="err">{{ err }}</div>{% endif %}
+    <div class="hint">Find the generated key at <code>data/ADMIN_KEY.txt</code> or set <code>ADMIN_KEY</code> in your environment before first start.</div>
+  </form>
+</body>
+</html>

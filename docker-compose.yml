@@ -1,0 +1,19 @@
+services:
+  photoroom-2api:
+    build: .
+    image: photoroom-2api:latest
+    container_name: photoroom-2api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Leave blank to auto-generate. Generated admin key is saved to the volume at data/ADMIN_KEY.txt
+      - ADMIN_KEY=${ADMIN_KEY:-}
+      - DEMO_KEY=${DEMO_KEY:-}
+      - FLASK_SECRET=${FLASK_SECRET:-}
+      - DATA_DIR=/app/data
+    volumes:
+      - photoroom_data:/app/data
+
+volumes:
+  photoroom_data:

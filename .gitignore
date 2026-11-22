@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+data/
+ADMIN_KEY.txt
+demo.log
+anon_token.json
+.env
+*.apk
+jadx-out/
+apk-unzip/
